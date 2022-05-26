@@ -1,12 +1,13 @@
 -- coded by lance#8213, from scratch
 -- if you are stealing my code to use it in another menu actually kys
+-- extra options and fixes by Axhov#0001, not from scratch lol. Lots of stuff taken from wiriscript.
 
 slaxdom = require("lib/slaxdom")
 slaxml = require("lib/slaxml")
 util.require_no_lag("natives-1627063482")
 handle_ptr = memory.alloc(13*8)
 
-
+util.toast("TEOF edits by Axhov#0001, LanceScript By Lance")
 vehicles_dir = filesystem.scripts_dir() .. '\\menyoo vehicles\\'
 if not filesystem.is_dir(vehicles_dir) then
     filesystem.mkdir(vehicles_dir)
@@ -35,7 +36,7 @@ function log(content)
     end
 end
 
-ocoded_for = 1.58
+ocoded_for = 1.60
 is_loading = true
 -- enable to generate helpful logs for lance!
 verbose = false
@@ -61,6 +62,7 @@ chauffeur_root = menu.list(transport_root, "Chauffeur", {"lancescriptchauffeur"}
 weapons_root = menu.list(self_root, "Weapons", {"lancescriptweapons"}, "Weapon adjustments and tweaks")
 silent_aimbotroot = menu.list(weapons_root, "Silent aimbot", {"lancescriptsilentaimbot"}, "Precisely shoot peds and players even if your shots miss, lol")
 entity_gun = menu.list(weapons_root, "Entity gun", {"lancescriptentgun"}, "Shoot entities.")
+cross = menu.list(weapons_root, "Crosshair disabling types", {"crosshairs"}, "Different ways to disable your crosshair for different scenarios")
 pedmoney_root = menu.list(recoveries_root, "Ped money", {"lancescriptrecoveries"}, "TESTED FOR A LONG TIME FOR SAFETY, BUT STILL USE AT YOUR OWN RISK!")
 spooner_root = menu.list(world_root, "Lance spooner", {"lancescriptspooner"}, "Spawn, move, and modify objects!")
 --
@@ -104,6 +106,28 @@ menu.toggle(lancescript_root, "Verbose mode", {"lsverbose"}, "Spams your console
     verbose = on
 end)
 sounds_root = menu.list(lancescript_root, "Sounds", {"lancescriptsounds"}, "")
+
+meme_root = menu.list(lancescript_root, "Memes", {"teofmemes"}, "timeless (maybe) classics. Come here for a laugh or dont I don't care but don't dm me telling me these are shit")
+
+menu.hyperlink(meme_root, "Aughhhhh", "https://www.youtube.com/shorts/wIIRyyIc7Nw", "")
+menu.hyperlink(meme_root, "Grandpa Found the Car Keys", "https://www.youtube.com/watch?v=PGJKeESLBpQ", "")
+menu.hyperlink(meme_root, "The Hungry, Hungry Baby", "https://www.youtube.com/watch?v=X0pEBE_eYdU", "")
+menu.hyperlink(meme_root, "Cheese", "https://www.youtube.com/watch?v=SyimUCBIo6c", "")
+menu.hyperlink(meme_root, "Snap Back To Reality", "https://www.youtube.com/watch?v=fV3nflAQ99w", "")
+menu.hyperlink(meme_root, "how is prangent formed", "https://www.youtube.com/watch?v=EShUeudtaFg", "")
+menu.hyperlink(meme_root, "john madden", "https://www.youtube.com/watch?v=Hv6RbEOlqRo", "")
+menu.hyperlink(meme_root, "Scott Bradford", "https://www.youtube.com/watch?v=Pbkn21NNduc", "")
+menu.hyperlink(meme_root, "Big Bill Hell's", "https://www.youtube.com/watch?v=4sZuN0xXWLc", "")
+menu.hyperlink(meme_root, "fart withh extra reverb", "https://www.youtube.com/watch?v=hr7GyFM7pX4", "")
+menu.hyperlink(meme_root, "Deleted Wikipedia articles submitted by insane people", "https://www.youtube.com/watch?v=29vjQwnt-Fw", "")
+menu.hyperlink(meme_root, "I put crack in their hotdogs", "https://www.youtube.com/shorts/gMZTAvBYPxs", "watch all the way through")
+menu.hyperlink(meme_root, "OBJECTS THAT I HAVE SHOVED UP MY ARSE", "https://www.youtube.com/watch?v=6LvlG2dTQKg", "")
+menu.hyperlink(meme_root, "are you guys going trick or treating", "https://www.youtube.com/watch?v=asgtIKR3CeA", "")
+menu.hyperlink(meme_root, "THAT SHIT IS FUCKING TRASH", "https://www.youtube.com/watch?v=lA9QwsgOvpU", "")
+menu.hyperlink(meme_root, "Samir you're breaking the car", "https://www.youtube.com/watch?v=D9-voINFkCg", "")
+menu.hyperlink(meme_root, "", "", "")
+menu.hyperlink(meme_root, "", "", "")
+
 menu.action(menu.my_root(), "Players shortcut", {}, "Quickly opens session players list, for convenience", function(on_click)
     menu.trigger_commands("playerlist")
 end)
@@ -131,6 +155,8 @@ function hasValue( tbl, str )
     end
     return f
 end
+
+broken_root = menu.list(gametweaks_root, "Broken Options", {"brop"}, "BROKEN OPTIONS THAT I MAY OR MAY NOT ADD. IF SOMETHING IS HERE THAT MEANS IT DOES NOT WORK. IT MAY DO NOTHING, OR IT MAY CRASH YOUR GAME.")
 
 -- credit to https://stackoverflow.com/questions/1426954/split-string-in-lua
 function split_str(inputstr, sep)
@@ -511,7 +537,7 @@ function menyoo_load_map(path)
 
     menu.action(mm_maproot, "Delete map", {"menyoomdelete" .. mmblip}, "cease it to exist.", function(on_click)
         for k,v in pairs(all_entities) do
-            entities.delete(v)
+            entities.delete_by_handle(v)
         end
         menu.delete(mm_maproot)
         -- apparently remove blip is fucked, so we set sprite to invis as a failsafe
@@ -650,7 +676,7 @@ function menyoo_load_vehicle(path, ped, doteleport, ours)
     local this_veh_root = menu.list(menyoovloaded_root, vehicle .. " [" .. VEHICLE.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY.GET_ENTITY_MODEL(vehicle)) .. "]", {"lancescriptmenyoov" .. vehicle}, "")
     menu.action(this_veh_root, "Delete", {"deletemenyoov" .. vehicle}, "Delete this vehicle. Make it cease to exist.", function(on_click)
         for k,v in pairs(all_entities) do
-            entities.delete(v)
+            entities.delete_by_handle(v)
         end
         menu.delete(this_veh_root)
         HUD.SET_BLIP_ALPHA(this_blip, 0)
@@ -759,7 +785,7 @@ function set_player_into_suitable_seat(ent)
     local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)
     if not is_ped_player(driver) or driver == 0 then
         if driver ~= 0 then
-            entities.delete(driver)
+            entities.delete_by_handle(driver)
         end
         PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), ent, -1)
     else
@@ -799,7 +825,11 @@ menu.action(credits_root, "Hollywood Collins", {}, "For continued support of Lan
 end)
 menu.action(credits_root, "aaronlink127", {}, "Code suggestions", function(on_click)
 end)
-menu.action(credits_root, "Nowiry", {}, "Great developer, making some useful funcs that Lancescript uses", function(on_click)
+
+menu.action(credits_root, "Axhov", {}, "Developer of TEOF", function(on_click)
+end)
+
+menu.action(credits_root, "Nowiry", {}, "Great developer, making some useful funcs that Lancescript uses, also helps in the continued development of TEOF", function(on_click)
 end)
 menu.action(credits_root, "Lancito01", {}, "Donating to me :)", function(on_click)
 end)
@@ -1037,12 +1067,7 @@ function npc_jack(target, nearest)
     end)
 end
 
-async_http.init("pastebin.com", "/raw/TZYVqUjv", function(result)
-    menu.hyperlink(lancescript_root, "Join Lancescript Sanctuary!", result, "")
-end)
-async_http.dispatch()
-
-menu.hyperlink(lancescript_root, "View Lancescript guilded post", "https://www.guilded.gg/stand/groups/x3ZgB10D/channels/7430c963-e9ee-40e3-ab20-190b8e4a4752/docs/265965", "")
+menu.hyperlink(lancescript_root, "LanceScript Archive", "https://archive.org/details/lancescript-incomplete-archive", "an archive of the lancescript versions I downloaded as they came out, dating to before the repository was a thing. NOT MEANT TO BE USED. THESE ARE OUTDATED.")
 
 menu.toggle(lancescript_root, "Show active entity pools", {"entitypoolupdates"}, "Toasts what entity pools are being updated every tick. The more you see, the more performance loss; getting all entities is a heavy task.", function(on)
     show_updates = on
@@ -1066,23 +1091,6 @@ end, function(on_command)
     util.toast("STAT returned " .. memory.read_int(outptr))
     log("toast stat free mem")
     memory.free(outptr)
-end)
-
-
-menu.hyperlink(lancescript_root, "Watch Konosuba! ep 1", "https://www.youtube.com/watch?v=H8CORxz5FKA", "")
-
-menu.hyperlink(lancescript_root, "Make me cry", "https://www.youtube.com/watch?v=fzQ6gRAEoy0")
-
-menu.hyperlink(lancescript_root, "Tweet about Lancescript", "https://twitter.com/compose/tweet?text=Lancescript is the best LUA script ever!", "")
-
-donotpress_root = menu.list(lancescript_root, "Do not press", {}, "")
-phrases = {"Spoiled, aren\'t you?", "Why are you doing this?", "I mean...", "This IS a waste of time, isn\'t it?", "Think about it.", "I asked you not to do this..", "But you\'re still doing it.", "...", "I don\'t know what you expect to happen.", "This isn\'t going to give you a million dollars.", "This wont get you a soulmate.", "You WOULD like a soulmate, right?", "I know things get lonely..", "I know.", "We can hug it out.", "Only if you stop pressing this, that is.", "Please stop.", "I literally asked nicely.", "Would you like me to cry?", "Is that what you want?", "You are demented.", "What a sick person.", "How much time have you wasted here?", "Error", "I literally said error", "That didn\'t trick you?", "You know what?", "I\'ve had it.", "If you keep clicking this", "A child in an impoverished country will die right now.", "Beginning now.", "The next time you click it happens.", "Wow, you have no morals do you?", "1 child dead.", "All because of you.", "We fucking shot him.", "Yep.", "His life was in your hands.", "And you decided to throw it away.", "How pathetic.", "You know what? You win.", "Piece of shit.", "Asshole.", "Fine.", "Have it your way.", "Goodbye."}
-lastid = donotpress_root
-for k,p in pairs(phrases) do
-    lastid = menu.list(lastid, p, {}, "")
-end
-menu.action(lastid, "congrats.", {}, "congrats on literally nothing. i hope you\'re happy. idiot.", function(on_click)
-    util.toast("the button did literally nothing, idiot. ugh.")
 end)
 
 joinsound = false
@@ -1284,6 +1292,41 @@ menu.toggle(weapons_root, "Invisible weapons", {"invisguns"}, "Makes your weapon
     local plyr = PLAYER.PLAYER_PED_ID()
     WEAPON.SET_PED_CURRENT_WEAPON_VISIBLE(plyr, not on, false, false, false) 
 end, false)
+
+menu.toggle_loop(cross, "No Crosshairs (PVP/E)", {"invischpvp"}, "Makes your Crosshair invisible. Designed for PVP/E. Automatically disabled when holding snipers and when in vehicles with weapons. Use in conjuction with Crosshair lua by CocoW in the repository for functioning custom crosshairs :pog:", function()
+    local currentWeapon = WEAPON.GET_SELECTED_PED_WEAPON(PLAYER.PLAYER_PED_ID())
+	local plyr = PLAYER.PLAYER_PED_ID()
+	local vehicle = PED.IS_PED_IN_ANY_VEHICLE(plyr, true) 
+	cars = {}
+	if vehicle == true then
+		local cock = PED.GET_VEHICLE_PED_IS_IN(plyr, false)
+        if not VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(cock) then
+			HUD.HIDE_HUD_COMPONENT_THIS_FRAME(14)
+		end
+	else
+		if WEAPON.GET_WEAPONTYPE_GROUP(currentWeapon) ~= -1212426201 then
+			HUD.HIDE_HUD_COMPONENT_THIS_FRAME(14)
+		end
+    end
+end)
+
+menu.toggle_loop(cross, "No Crosshairs", {"invisch"}, "Makes your Crosshair invisible. Does not disable itself unless you disable it. Use in conjuction with Crosshair lua by CocoW in the repository for functioning custom crosshairs :pog:", function()
+    HUD.HIDE_HUD_COMPONENT_THIS_FRAME(14)
+end)
+
+menu.toggle_loop(cross, "No Crosshairs (PVP/E) (Snipers Included)", {"invischpvp2"}, "Makes your Crosshair invisible. Designed for PVP/E. Automatically disabled when in vehicles with weapons, but NOT when holding snipers. Use in conjuction with Crosshair lua by CocoW in the repository for functioning custom crosshairs :pog:", function()
+    local currentWeapon = WEAPON.GET_SELECTED_PED_WEAPON(PLAYER.PLAYER_PED_ID())
+	local plyr = PLAYER.PLAYER_PED_ID()
+	local vehicle = PED.IS_PED_IN_ANY_VEHICLE(plyr, true) 
+	if vehicle == true then
+		local cock = PED.GET_VEHICLE_PED_IS_IN(plyr, false)
+        if not VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(cock) then
+			HUD.HIDE_HUD_COMPONENT_THIS_FRAME(14)
+		end
+	else
+		HUD.HIDE_HUD_COMPONENT_THIS_FRAME(14)
+    end
+end)
 
 aim_info = false
 menu.toggle(weapons_root, "Aim info", {"aiminfo"}, "Displays info of the entity you\'re aiming at", function(on)
@@ -1566,12 +1609,12 @@ taxi_blip = -1
 function create_chauffeur(vhash, phash)
     if taxi_veh ~= 0 then
         taxi_veh = 0
-        entities.delete(taxi_veh)
+        entities.delete_by_handle(taxi_veh)
     end
     if taxi_ped ~= 0 then
         taxi_ped = 0
         HUD.REMOVE_BLIP(taxi_blip)
-        entities.delete(taxi_ped)
+        entities.delete_by_handle(taxi_ped)
     end
     local plyr = PLAYER.PLAYER_PED_ID()
     local coords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(plyr, 0.0, 5.0, 0.0)
@@ -1684,11 +1727,11 @@ end)
 
 menu.action(chauffeur_root, "Chauffeur: Delete", {"chdelete"}, "Deletes the chauffeur and his car", function(on_click)
     if taxi_veh ~= 0 then
-        entities.delete(taxi_veh)
+        entities.delete_by_handle(taxi_veh)
         taxi_veh = 0
     end
     if taxi_ped ~= 0 then
-        entities.delete(taxi_ped)
+        entities.delete_by_handle(taxi_ped)
         taxi_ped = 0
     end
     HUD.REMOVE_BLIP(taxi_blip)
@@ -2361,7 +2404,7 @@ function delete_entity(ent)
     end
     menu.delete(ent_lists[ent])
     ent_lists[ent] = nil
-    entities.delete(ent)
+	entities.delete_by_handle(ent)
 end
 
 function create_entity_listing(ent, type)
@@ -2661,7 +2704,7 @@ menu.action(vehicles_root, "Teleport into closest vehicle", {"closestvehicle"}, 
         PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), closestveh, -1)
     else
         if not is_ped_player(driver) then
-            entities.delete(driver)
+            entities.delete_by_handle(driver)
             PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), closestveh, -1)
         elseif VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(closestveh) then
             for i=0, 10 do
@@ -2839,7 +2882,7 @@ end
 menu.action(train_root, "Hijack closest train", {"hijacktrain"}, "", function(on_click)
     train = get_closest_train()
     if train ~= 0 then
-        entities.delete(VEHICLE.GET_PED_IN_VEHICLE_SEAT(train, -1))
+        entities.delete_by_handle(VEHICLE.GET_PED_IN_VEHICLE_SEAT(train, -1))
         PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), train, -1)
         AUDIO.SET_VEHICLE_RADIO_ENABLED(train, true)
         util.toast("Success! Leave the train by using vehicle > force leave vehicle.")
@@ -2913,17 +2956,17 @@ end, false)
 menu.action(world_root, "Super cleanse", {"supercleanse"}, "Uses stand API to delete EVERY entity it finds (including player vehicles!).", function(on_click)
     local ct = 0
     for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
-        entities.delete(ent)
+        entities.delete_by_handle(ent)
         ct = ct + 1
     end
     for k,ent in pairs(entities.get_all_peds_as_handles()) do
         if not is_ped_player(ent) then
-            entities.delete(ent)
+            entities.delete_by_handle(ent)
         end
         ct = ct + 1
     end
     for k,ent in pairs(entities.get_all_objects_as_handles()) do
-        entities.delete(ent)
+        entities.delete_by_handle(ent)
         ct = ct + 1
     end
     util.toast("Super cleanse is complete! " .. ct .. " entities removed.")
@@ -2971,6 +3014,18 @@ menu.toggle(world_root, "Lightning spam", {"lightningspam"}, "epileptic-hating z
     lightning_spam = on
 end, false)
 
+function getOffsetFromEntityGivenDistance(entity, distance)
+	local pos = ENTITY.GET_ENTITY_COORDS(entity, 0)
+	local theta = (math.random() + math.random(0, 1)) * math.pi --returns a random angle between 0 and 2pi (exclusive)
+	local coords = vect.new(
+		pos.x + distance * math.cos(theta),
+		pos.y + distance * math.sin(theta),
+		pos.z
+	)
+	return coords
+end
+
+
 function start_meteor_shower()
     meteor_thr = util.create_thread(function(thr)
         while true do
@@ -3005,7 +3060,7 @@ function plane_vel_thread(ent, pilot, tar)
         local start_time = os.time()
         while true do
             if os.time() - start_time >= 10 then
-                entities.delete(ent)
+                entities.delete_by_handle(ent)
                 util.stop_thread()
             end
             if not ent or ent == 0 or not ENTITY.DOES_ENTITY_EXIST(ent) or ENTITY.IS_ENTITY_DEAD(ent) then
@@ -3017,6 +3072,20 @@ function plane_vel_thread(ent, pilot, tar)
             util.yield()
         end
     end)
+end
+
+function pairsByKeys(t, f)
+	local a = {}
+	for n in pairs(t) do table.insert(a, n) end
+	table.sort(a, f)
+	local i = 0
+	local iter = function()
+		i = i + 1
+		if a[i] == nil then return nil
+		else return a[i], t[a[i]]
+		end
+	end
+	return iter
 end
 
 function start_angryplanes()
@@ -3180,7 +3249,7 @@ menu.action(vehicles_root, "Replace all cars with tractors", {"tractors"}, "yeeh
                 TASK.TASK_COMBAT_PED(ped, playerped, 0, 16)
                 local hdg = ENTITY.GET_ENTITY_HEADING(veh)
                 local oldspeed = ENTITY.GET_ENTITY_SPEED(veh)
-                entities.delete(veh)
+                entities.delete_by_handle(veh)
                 local newveh = entities.create_vehicle(-2076478498, coords, hdg)
                 PED.SET_PED_INTO_VEHICLE(ped, newveh, -1)
                 VEHICLE.SET_VEHICLE_ENGINE_ON(newveh, true, true, false)
@@ -3242,7 +3311,7 @@ function spam_entity_on_player(ped, hash)
             grav_factor = 0.0
         end
         ENTITY.SET_ENTITY_HAS_GRAVITY(obj, entity_grav)
-        OBJECT.SET_ACTIVATE_OBJECT_PHYSICS_AS_SOON_AS_IT_IS_UNFROZEN(obj, true)
+        ENTITY.FREEZE_ENTITY_POSITION(obj)
     end
     util.toast('Done spamming entities.')
 end
@@ -3336,10 +3405,7 @@ end)
 
 menu.action(vehicle_root, "Vehicle 180", {"vehicle180"}, "Turns your vehicle around with momentum preserved. Recommended to bind this.", function(on_click)
     if player_cur_car ~= 0 then
-        local rot = ENTITY.GET_ENTITY_ROTATION(player_cur_car, 0)
-        local vel = ENTITY.GET_ENTITY_VELOCITY(player_cur_car)
-        ENTITY.SET_ENTITY_ROTATION(player_cur_car, rot['x'], rot['y'], rot['z']+180, 0, true)
-        ENTITY.SET_ENTITY_VELOCITY(player_cur_car, -vel['x'], -vel['y'], vel['z'])
+		
     end
 end)
 
@@ -3480,6 +3546,8 @@ menu.toggle(self_root, "Walk on air", {"walkonair"}, "the gods! this will not fu
         walkonair = false
     end
 end)
+
+rainbow_tint = false
 
 moonwalk = false
 menu.toggle(self_root, "Moonwalk", {"moonwalk"}, "she was more like a beauty queen", function(on)
@@ -3864,7 +3932,7 @@ end
 function set_up_player_actions(pid)
     log("Setting up player actions for pid " .. pid)
     log("Set up divider for pid " .. pid)
-    menu.divider(menu.player_root(pid), "LanceScript")
+    menu.divider(menu.player_root(pid), "LanceScript TEOF")
     log("Set up ls nice for pid " .. pid)
     local ls_nice = menu.list(menu.player_root(pid), "Lancescript: Nice", {"lsnice"}, "")
     log("Set up vaddons for pid " .. pid)
@@ -3884,8 +3952,10 @@ function set_up_player_actions(pid)
     plpedmoney_root = menu.list(plrecoveries_root, "Ped money", {"plpedmoney"}, "")
     npctrolls_root = menu.list(ls_naughty, "NPC trolling", {"npctrolls"}, "")
     attackers_root = menu.list(npctrolls_root, "Attackers", {"lancescriptattackers"}, "Send attackers")
-    customatk_root = menu.list(attackers_root, "Custom attackers", {"lancescriptcustomatk"}, "Spawn custom attackers")
-	atkab_root = menu.list(attackers_root, "Attacker attributes", {"crimescriptatkatb"}, "attacker attributes")
+	vehatk_root = menu.list(npctrolls_root, "Hostile Traffic Options", {"axhovattackers"}, "Hostile Traffic options")
+	cop_root = menu.list(attackers_root, "Cop Mods", {"cops"}, "Modifications to apply to police spawned by the game, as well as attackers you spawn, but more for police.")
+	atkab_root = menu.list(attackers_root, "Attacker attributes", {"atkatb"}, "attacker attributes")
+	army_root = menu.list(attackers_root, "Marine Variants", {"teofatkarmy"}, "we are the army. run run. we are the army. run run.")
     objecttrolls_root = menu.list(ls_naughty, "Object trolling", {"objecttrolls"}, "")
     ram_root = menu.list(ls_naughty, "Ram", {"ram"}, "")
     log("Set up roots for pid " .. pid)
@@ -3964,6 +4034,15 @@ function set_up_player_actions(pid)
     end)
     log("forcedact destroyeng added")
 
+    menu.action(forcedacts_root, "set vehicle engine to almost broken", {"damagevengine"}, "This MAY OR MAY NOT WORK. It is NOT a bug if this does not work.", function(on_click)
+        local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+        if car ~= 0 then
+            request_control_of_entity(car)
+            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(car, 1.0)
+			VEHICLE.SET_VEHICLE_BODY_HEALTH(car, 1)
+        end
+    end)
+
     menu.action(forcedacts_root, "Repair vehicle :)", {"repairveh"}, "This MAY OR MAY NOT WORK. It is NOT a bug if this does not work.", function(on_click)
         local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
         if car ~= 0 then
@@ -4011,6 +4090,14 @@ function set_up_player_actions(pid)
     end)
     log("forcedact stand added")
 
+    menu.action(forcedacts_root, "Set license plate to COCK", {"cocklicense"}, "This MAY OR MAY NOT WORK. It is NOT a bug if this does not work.", function(on_click)
+        local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+        if car ~= 0 then
+            request_control_of_entity(car)
+            VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(car, "COCK")
+        end
+    end)
+
     menu.action(forcedacts_root, "Custom plate text", {"customplatetext"}, "", function(on_click)
         local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
         if car ~= 0 then
@@ -4054,6 +4141,19 @@ function set_up_player_actions(pid)
     end)
     log("forcedact closedoors added")
 
+    menu.action(broken_root, "Disable Missiles", {"removevehm"}, "This MAY OR MAY NOT WORK. It is NOT a bug if this does not work. **ONLY applies to vehicles that DO NOT have missiles by default, like the deluxo or oppressor mk1 and mk2.**.", function(on_click)
+       local vehicle = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+	   local owner = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX()
+        if vehicle ~= 0 then
+            if VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(vehicle) then 
+				VEHICLE.SET_VEHICLE_MOD_KIT(vehicle, 0)
+				VEHICLE.SET_VEHICLE_MOD(vehicle, 10, -1)
+			else 
+				util.toast("Player is either not in a vehicle, vehicle does not have weapons, or you are out of range.")
+			end
+		end
+	end)
+	
     menu.action(forcedacts_root, "Godmode vehicle", {"godmodev"}, "This MAY OR MAY NOT WORK. It is NOT a bug if this does not work.", function(on_click)
         local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
         if car ~= 0 then
@@ -4062,7 +4162,6 @@ function set_up_player_actions(pid)
             VEHICLE.SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(car, false)
         end
     end)
-    log("forcedact godmodev added")
 
     menu.click_slider(forcedacts_root, "Vehicle top speed", {"vtopspeed"}, "This MAY OR MAY NOT WORK. It is NOT a bug if this does not work.", 0, 3000, 200, 100, function(s)
         local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
@@ -4137,6 +4236,13 @@ function set_up_player_actions(pid)
         local hash = util.joaat(on_command)
         give_car_addon(pid, hash, true, 0.0)
     end)
+	
+		menu.toggle_loop(ls_naughty, "snowball loop", {balls}, "test option I coded that I don't feel like removing for the reason stated in the next sentence. You can kill people in apartment garages with this.", function()
+		local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid))
+		local hash = 126349499
+		WEAPON.REQUEST_WEAPON_ASSET(hash)
+		MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(pos.x, pos.y, pos.z, pos.x , pos.y, pos.z-2, 200, 0, hash, 0, true, false, 2500.0)
+	end)
 
     menu.action(ls_naughty, "Crush player", {"crush"}, "Spawns a heavy truck several meters above them and forces its Z velocity to -100 to absolutely decimate them when it lands.", function(on_click)
         local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
@@ -4148,18 +4254,76 @@ function set_up_player_actions(pid)
         local truck = entities.create_vehicle(1917016601, coords, 0.0)
         local vel = ENTITY.GET_ENTITY_VELOCITY(vel)
         ENTITY.SET_ENTITY_VELOCITY(truck, vel['x'], vel['y'], -100.0)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED(truck, 3)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(truck, true)
+		wait(2000)
+		entities.delete_by_handle(truck)
     end)
-	
+
 	 menu.action(ls_naughty, "Crush player (Faggio)", {"crush2"}, "Spawns a Faggio to crush them in case your target is standing next to a light pole or other situations where the truck would miss.", function(on_click)
         local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
         coords = ENTITY.GET_ENTITY_COORDS(target_ped, false)
         coords.x = coords['x']
         coords.y = coords['y']
         coords.z = coords['z'] + 20.0
-        request_model_load(55628203)
-        local truck = entities.create_vehicle(55628203, coords, 0.0)
+        request_model_load(util.joaat("faggio2"))
+        local truck = entities.create_vehicle(util.joaat("faggio2"), coords, 0.0)
         local vel = ENTITY.GET_ENTITY_VELOCITY(vel)
         ENTITY.SET_ENTITY_VELOCITY(truck, vel['x'], vel['y'], -200.0)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED(truck, 3)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(truck, true)
+		wait(2000)
+		entities.delete_by_handle(truck)
+    end)
+	
+	 menu.action(ls_naughty, "Crush player (Clown)", {"crush3"}, "Show them they are a clown", function(on_click)
+        local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        coords = ENTITY.GET_ENTITY_COORDS(target_ped, false)
+        coords.x = coords['x']
+        coords.y = coords['y']
+        coords.z = coords['z'] + 20.0
+        request_model_load(util.joaat("speedo2"))
+        local truck = entities.create_vehicle(util.joaat("speedo2"), coords, 0.0)
+        local vel = ENTITY.GET_ENTITY_VELOCITY(vel)
+        ENTITY.SET_ENTITY_VELOCITY(truck, vel['x'], vel['y'], -200.0)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED(truck, 3)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(truck, true)
+		wait(2000)
+		entities.delete_by_handle(truck)
+    end)
+
+	 menu.action(ls_naughty, "Crush player (Invisible)", {"crush4"}, "crush but with clown van", function(on_click)
+        local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        coords = ENTITY.GET_ENTITY_COORDS(target_ped, false)
+        coords.x = coords['x']
+        coords.y = coords['y']
+        coords.z = coords['z'] + 20.0
+        request_model_load(1917016601)
+        local truck = entities.create_vehicle(1917016601, coords, 0.0)
+        local vel = ENTITY.GET_ENTITY_VELOCITY(vel)
+        ENTITY.SET_ENTITY_VELOCITY(truck, vel['x'], vel['y'], -200.0)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED(truck, 3)
+		ENTITY.SET_ENTITY_VISIBLE(truck, false, 0)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(truck, true)
+		wait(2000)
+		entities.delete_by_handle(truck)
+    end)
+
+	 menu.action(ls_naughty, "Crush player (Invisible Faggio)", {"crush5"}, "Spawns a Faggio to crush them in case your target is standing next to a light pole or other situations where the truck would miss.", function(on_click)
+        local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        coords = ENTITY.GET_ENTITY_COORDS(target_ped, false)
+        coords.x = coords['x']
+        coords.y = coords['y']
+        coords.z = coords['z'] + 20.0
+        request_model_load(util.joaat("faggio2"))
+        local truck = entities.create_vehicle(util.joaat("faggio2"), coords, 0.0)
+        local vel = ENTITY.GET_ENTITY_VELOCITY(vel)
+        ENTITY.SET_ENTITY_VELOCITY(truck, vel['x'], vel['y'], -200.0)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED(truck, 3)
+		ENTITY.SET_ENTITY_VISIBLE(truck, false, 0)
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(truck, true)
+		wait(2000)
+		entities.delete_by_handle(truck)
     end)
 	
 
@@ -4220,7 +4384,7 @@ function set_up_player_actions(pid)
 	
 	menu.action(spawnvehicle_root, "Veto Modern", {"veto2"}, "its just a go kart idfk", function(on_click)
         give_vehicle(pid, util.joaat("veto2"))
-			if vehv == on then
+			if vehv == on then -- unused, wouldnt work if you tried to get it to work
 				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(util.joaat, 200)
 			end
 	end)
@@ -4362,12 +4526,6 @@ function set_up_player_actions(pid)
         end
     end, false)
 
-    menu.action(customatk_root, "Custom ped model", {"custompedmodel"}, "Input a custom model for the attacker. The model string, NOT the hash.", function(on_click)
-        util.toast("Please input the model hash")
-        menu.show_command_box("custompedmodel" .. PLAYER.GET_PLAYER_NAME(pid) .. " ")
-    end, function(on_command)
-        send_attacker(util.joaat(on_command), pid, true)
-    end)
 
 -------------------------------------------------------------
 --functions needed to make hostile traffic work (from wiriscript) (some stuff may be useless here)
@@ -4484,13 +4642,14 @@ wait = util.yield
         send_attacker(-1788665315, pid, false)
     end)
 
-    menu.action(attackers_root, "Mountain lion attack", {"cougaratk"}, "rawr", function(on_click)
+    menu.action(attackers_root, "Mountain lion attack", {"cougaratk"}, "there aren't cougars in missions, or my sex life :sadge:", function(on_click)
         send_attacker(307287994, pid, false)
     end)
 
     menu.action(attackers_root, "Brad attack", {"bradatk"}, "scary", function(on_click)
         send_attacker(util.joaat("CS_BradCadaver"), pid, false)
     end)
+	
 
     --WEAPON.GIVE_WEAPON_TO_PED(ped, 453432689, 0, false, true)
 
@@ -4560,25 +4719,6 @@ wait = util.yield
         dispatch_griefer_jesus2(pid)
     end)
 
-    menu.toggle(objecttrolls_root, "Glitch vehicle", {"glitchveh"}, "Glitches the car they\'re in/if they enter one.", function(on)
-        if on then
-            local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
-            local veh = PED.GET_VEHICLE_PED_IS_IN(target_ped, true)
-            local coords = ENTITY.GET_ENTITY_COORDS(target_ped, false)
-            coords.x = coords['x']
-            coords.y = coords['y']
-            coords.z = coords['z']
-            local hash = 4173164723
-            request_model_load(hash)
-            guitar = OBJECT.CREATE_OBJECT_NO_OFFSET(hash, coords['x'], coords['y'], coords['z'], true, false, false)
-            ENTITY.SET_ENTITY_VISIBLE(guitar, false)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(guitar, target_ped, 0, 0.0, -0.20, 0.50, 1.0, 1.0,1, true, true, true, false, 0, true)
-        else
-            ENTITY.DETACH_ENTITY(guitar, false, false)
-            entities.delete(guitar)
-        end
-    end)
-
     menu.action(attackers_root, "Send jets", {"sendjets"}, "We don\'t charge $140 for this extremely basic feature. However the jets will only target the player until the player dies, otherwise we would need another thread, and I don\'t want to make one.", function(on_click)
         local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
         coords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(target_ped, 1.0, 0.0, 500.0)
@@ -4617,19 +4757,6 @@ wait = util.yield
         send_aircraft_attacker(util.joaat("cargoplane"), -163714847, pid)
     end)
 
-    menu.action(customatk_root, "Custom aircraft attacker", {"customaircraftatk"}, "Input a custom model for the attacker\'s aircraft.", function(on_click)
-        util.toast("Please input the model hash")
-        menu.show_command_box("customaircraftatk" .. PLAYER.GET_PLAYER_NAME(pid) .. " ")
-    end, function(on_command)
-        send_aircraft_attacker(util.joaat(on_command), -163714847, pid)
-    end)
-
-    menu.action(customatk_root, "Custom ground vehicle attacker", {"customgvatk"}, "Input a custom model for the attacker\'s ground vehicle.", function(on_click)
-        util.toast("Please input the model hash")
-        menu.show_command_box("customgvatk" .. PLAYER.GET_PLAYER_NAME(pid) .. " ")
-    end, function(on_command)
-        send_groundv_attacker(util.joaat(on_command), 850468060, pid, true)
-    end)
 
     menu.action(entspam_root, "Traffic cones", {"conespam"}, "Spams traffic cones", function(on_click)
         local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
@@ -4788,7 +4915,7 @@ wait = util.yield
 
     menu.action(ls_naughty, "Delete vehicle", {"deleteveh"}, "delete the vehicle they\'re in lol", function(on_click)
         local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
-        entities.delete(car)
+        entities.delete_by_handle(car)
     end)
 
     menu.action(ls_naughty, "Cargo plane trap", {"cargoplanetrap"}, "Traps the player in a cargo plane.", function(on_click)
@@ -4812,6 +4939,15 @@ wait = util.yield
     menu.action(npctrolls_root, "NPC jack last car v3.0", {"npcjack"}, "Sends an NPC to steal their car.", function(on_click)
         npc_jack(pid, false)
     end)
+
+function SET_ENT_FACE_ENT(ent1, ent2) 
+	local a = ENTITY.GET_ENTITY_COORDS(ent1)
+	local b = ENTITY.GET_ENTITY_COORDS(ent2)
+	local dx = b.x - a.x
+	local dy = b.y - a.y
+	local heading = MISC.GET_HEADING_FROM_VECTOR_2D(dx, dy)
+	return ENTITY.SET_ENTITY_HEADING(ent1, heading)
+end
 
     menu.action(attackers_root, "Bri'ish mode", {"british"}, "God save the queen.", function(on_click)
         local hash = 0x9C9EFFD8
@@ -4869,8 +5005,10 @@ wait = util.yield
 			ENTITY.SET_ENTITY_HEALTH(ped, 250)
 			PED.SET_PED_SHOOT_RATE(ped, 5)
 			PED.SET_PED_SUFFERS_CRITICAL_HITS(ped, false)
-			if d then
-				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+			PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(driver, true)
+			if d then -- unused
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(ped, 30000)
 			end
         end
     end)
@@ -4913,31 +5051,236 @@ wait = util.yield
         end
     end)
 	
-			menu.action(npctrolls_root, ('Hostile traffic'), {'hostiletraffic'}, 'All peds in vehicles near the player will maliciously run over or hit the player like a dumb low level. Press again to revive any peds that are dead in their vehicles (vehicle must be intact)(copied from wiriscript, now with increased range)', function()
+
+		menu.toggle_loop(cop_root, "Cracked Cops", {"combat3"}, "Makes police spawned by the game super cracked, increasing their accuracy and combat ability, as well as making their vehicle faster. There is a 0.5 second delay added to this loop due to npcs straight up not shooting with slower/ no delays in the loop.", function(on)
 		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped)
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 250)) do
+		local pt = PED.GET_PED_TYPE(ped)
+			if not PED.IS_PED_A_PLAYER(ped) and not PED.IS_PED_HURT(ped) then
+				if pt == 6 or pt == 27 then -- 6 is police, 27 is swat
+					REQUEST_CONTROL_LOOP(ped)
+					PED.SET_PED_COMBAT_ATTRIBUTES(ped, 46, true)
+					PED.SET_PED_COMBAT_ATTRIBUTES(ped, 2, true)
+					PED.SET_PED_FLEE_ATTRIBUTES(ped, 512, false)
+					PED.SET_PED_CAN_RAGDOLL(ped, false)
+					PED.SET_PED_SUFFERS_CRITICAL_HITS(ped, false)
+					WEAPON.GIVE_WEAPON_TO_PED(ped, -2084633992 , 9999, false, true)
+					WEAPON.SET_PED_DROPS_WEAPONS_WHEN_DEAD(ped, false)
+					PED.SET_PED_KEEP_TASK(ped, true)
+					PED.SET_PED_SHOOT_RATE(ped, 3)
+					ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+					WEAPON.SET_PED_INFINITE_AMMO_CLIP(ped, true)
+					ENTITY.SET_ENTITY_HEALTH(ped, 250)
+					PED.SET_PED_MAX_HEALTH(ped, 250)
+					if PED.IS_PED_IN_ANY_VEHICLE(target_ped, true) then
+						local veh = PED.GET_VEHICLE_PED_IS_IN(target_ped, false)
+						VEHICLE.MODIFY_VEHICLE_TOP_SPEED(veh, 80)
+						TASK.TASK_VEHICLE_CHASE(ped, player_ped)
+						WEAPON.GIVE_WEAPON_TO_PED(ped, 584646201 , 9999, false, true)
+						if godmodeatk then
+							ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+						end
+						if pcar then
+							PED.SET_PED_COMBAT_ATTRIBUTES(ped, 3, false)
+						end
+					else
+						WEAPON.GIVE_WEAPON_TO_PED(ped, -2084633992 , 9999, false, true)
+						TASK.TASK_COMBAT_PED(ped, player_ped, 0, 16)
+						end
+					wait(500)
+				end
+			end
+		end
+	end)
 	
+
+		menu.toggle_loop(cop_root, "Insane Cops", {"combat4"}, "Makes police spawned by the game and npcs from the attackers tab extremely powerful and deadly without making them invulnerable. Makes their vehicle invulnerable. Basically just cracked cops copied but with a damage multiplier.", function(on)
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped)
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 250)) do
+		local pt = PED.GET_PED_TYPE(ped)
+			if not PED.IS_PED_A_PLAYER(ped) and not PED.IS_PED_HURT(ped) then
+				if pt == 6 or pt == 27 then -- 6 is police, 27 is swat
+					REQUEST_CONTROL_LOOP(ped)
+					PED.SET_PED_COMBAT_ATTRIBUTES(ped, 46, true)
+					PED.SET_PED_COMBAT_ATTRIBUTES(ped, 2, true)
+					PED.SET_PED_FLEE_ATTRIBUTES(ped, 512, false)
+					PED.SET_PED_CAN_RAGDOLL(ped, false)
+					PED.SET_PED_SUFFERS_CRITICAL_HITS(ped, false)
+					WEAPON.GIVE_WEAPON_TO_PED(ped, -2084633992 , 9999, false, true)
+					WEAPON.SET_PED_DROPS_WEAPONS_WHEN_DEAD(ped, false)
+					PED.SET_PED_KEEP_TASK(ped, true)
+					PED.SET_PED_SHOOT_RATE(ped, 3)
+					ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+					WEAPON.SET_PED_INFINITE_AMMO_CLIP(ped, true)
+					PED.SET_AI_WEAPON_DAMAGE_MODIFIER(ped, 3000)
+					ENTITY.SET_ENTITY_HEALTH(ped, 250)
+					PED.SET_PED_MAX_HEALTH(ped, 250)
+					ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+					if PED.IS_PED_IN_ANY_VEHICLE(ped, true) then
+						local veh = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+						VEHICLE.MODIFY_VEHICLE_TOP_SPEED(veh, 50)
+						TASK.TASK_VEHICLE_CHASE(ped, player_ped)
+						WEAPON.GIVE_WEAPON_TO_PED(ped, 584646201 , 9999, false, true)
+						if pcar then
+							PED.SET_PED_COMBAT_ATTRIBUTES(ped, 3, false)
+						end
+					else
+						WEAPON.GIVE_WEAPON_TO_PED(ped, -2084633992 , 9999, false, true)
+						TASK.TASK_COMBAT_PED(ped, player_ped, 0, 16)
+					wait(500)
+					end
+				end
+			end
+		end
+	end)
+
+	
+		menu.toggle_loop(cop_root, "Always Aggro Cops", {"copmagnet"}, "Player always aggros cops even after death. Works with attackers from the attackers tab as well. Might (probably doesn't) break other stuff. (probably) Must be spectating or near the player for this to work. (havent tested if this is true lol)", function(on)
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid) -- gets the player 
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped) -- gets the players coords, defines it as "pos"
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 2500)) do -- executes everything under this line for all peds 900 units from the player
+		local pt = PED.GET_PED_TYPE(ped) -- gets the types of peds in this area
+			if not PED.IS_PED_A_PLAYER(ped) then  -- if the ped is not a player, execute everything under this line
+				if pt == 6 or pt == 27 then -- if the ped type is 6 or 27, execute everything under this line. 6 is police, 27 is swat
+					REQUEST_CONTROL_LOOP(ped) -- requests control
+					TASK.TASK_COMBAT_PED(ped, player_ped, 0, 0) --makes them fight the target
+				end
+			end
+		wait(30)
+		end
+	end)
+
+
+
+	menu.action(cop_root, "3 Star Wanted Level", {"threestar"}, "not a loop because technical reasons. Might not work so try spamming it I guess. Ill fix this when I get a chance.", function()
+		local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid))
+		
+		local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pedHash = util.joaat("s_m_y_cop_01")
+		local cop = entities.create_ped(6, pedHash, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(p, 0, 0, -90), CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		FIRE.ADD_OWNED_EXPLOSION(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), pos.x, pos.y, pos.z-90, 0, 10, false, false, 0)
+		ENTITY.SET_ENTITY_VISIBLE(cop, false, 0)
+		wait(500)
+		entities.delete_by_handle(cop)
+	end)
+	
+
+	menu.toggle_loop(broken_root, "High Grip Cops", {"stick"}, "", function(on)
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped)
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 250)) do
+		local pt = PED.GET_PED_TYPE(ped)
+			if not PED.IS_PED_A_PLAYER(ped) then
+				if pt == 6 or pt == 27 then -- 6 is police, 27 is swat
+					local veh = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+					local vel = ENTITY.GET_ENTITY_VELOCITY(veh)
+					vel['z'] = -vel['z'] --is this even needed?
+					ENTITY.APPLY_FORCE_TO_ENTITY(veh, 2, 0, 0, -50 -vel['z'], 0, 0, 0, 0, true, false, true, false, true)
+					--ENTITY.SET_ENTITY_VELOCITY(player_cur_car, vel['x'], vel['y'], -0.2)
+				end
+			end
+		end
+	end)
+
+
+
+		menu.action(npctrolls_root, "Delete Attackers", {"atkyeet"}, "deletes attackers as well as any police or noose units near the player.", function(on_click)
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid) 
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped)
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 2500)) do
+		local pt = PED.GET_PED_TYPE(ped)
+			if not PED.IS_PED_A_PLAYER(ped) then  
+				if pt == 6 or pt == 27 then -- 
+					entities.delete_by_handle(ped)
+				end
+			end
+		end
+	end)
+
+		menu.action(npctrolls_root, "Delete Attackers (alt)", {"atkyeet2"}, "try this if the other one doesnt work", function(on_click)
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid) 
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped)
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 2500)) do
+		local pt = PED.GET_PED_TYPE(ped)
+			if not PED.IS_PED_A_PLAYER(ped) then  
+				if pt == 6 or pt == 27 or pt == 1 then -- 
+					entities.delete_by_handle(ped)
+				end
+			end
+		end
+	end)
+
+		menu.action(cop_root, "Delete Cops", {"atkyeet"}, "deletes any police or noose units near the player, as well as attackers spawned by you.", function(on_click)
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid) 
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped)
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 2500)) do
+		local pt = PED.GET_PED_TYPE(ped)
+			if not PED.IS_PED_A_PLAYER(ped) then  
+				if pt == 6 or pt == 27 then -- 
+					entities.delete_by_handle(ped)
+				end
+			end
+		end
+	end)
+
+	
+		menu.toggle_loop(broken_root, "Police Asswhooping", {"polwh"}, "", function(on_click)
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid) 
+		local pos = ENTITY.GET_ENTITY_COORDS(player_ped)
+		for _, ped in ipairs(GET_NEARBY_PEDS(pid, 2500)) do
+		local pt = PED.GET_PED_TYPE(ped)
+			if not PED.IS_PED_A_PLAYER(ped) then  
+				if pt == 6 or pt == 27 then -- 
+					if ENTITY.IS_ENTITY_DEAD(ped) then
+						local iteration = 0
+						local sod = PED.GET_PED_SOURCE_OF_DEATH(ped)
+						if sod == player_ped then
+							local iteration = iteration + 1
+							wait(100)
+							entities.delete_by_handle(ped)
+						end
+						if iteration == 3 then
+							util.toast("police spawns")
+							iteration = 0
+						else
+						break
+						end
+					else
+					return
+					end
+				end
+			end
+		end
+	end)
+
+
+			menu.toggle_loop(vehatk_root, ('Hostile traffic'), {'hostiletraffic'}, 'All peds in vehicles near the player will maliciously run over or hit the player like a dumb low level. Press again to revive any peds that are dead in their vehicles (vehicle must be intact)(copied from wiriscript, now with increased range)', function()
+		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
 		for k, vehicle in pairs(GET_NEARBY_VEHICLES(pid, 2050)) do	
 			if not VEHICLE.IS_VEHICLE_SEAT_FREE(vehicle, -1) then
 				local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(vehicle, -1)
-				if not PED.IS_PED_A_PLAYER(driver) then 
+				if not PED.IS_PED_A_PLAYER(driver) then
 					REQUEST_CONTROL_LOOP(driver)
 					PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(driver, true)
 					PED.SET_PED_MAX_HEALTH(driver, 300)
 					ENTITY.SET_ENTITY_HEALTH(driver, 300)
 					VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 40)
 					TASK.CLEAR_PED_TASKS_IMMEDIATELY(driver)
+					VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
 					PED.SET_PED_INTO_VEHICLE(driver, vehicle, -1)
 					PED.SET_PED_COMBAT_ATTRIBUTES(driver, 46, true)
 					TASK.TASK_COMBAT_PED(driver, player_ped, 0, 0)
 					TASK.TASK_VEHICLE_MISSION_PED_TARGET(driver, vehicle, player_ped, 6, 100, 0, 0, 0, true)
+					wait(10)
 				end
 			end
 		end
 	end)
-	
-			menu.action(npctrolls_root, ('Toxic traffic'), {'toxictraffic'}, 'Hostile traffic, but it speeds up the car, locks the door, makes the vehicles in range invulnerable, and makes the occupant invulnerable.(copied from wiriscript, now with increased range)', function()
+
+			menu.toggle_loop(vehatk_root, ('Toxic traffic'), {'toxictraffic'}, 'Hostile traffic, but it speeds up the car, locks the door, makes the vehicles in range invulnerable, and makes the occupant invulnerable.(copied from wiriscript, now with increased range)', function()
 		local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
-	
 		for k, vehicle in pairs(GET_NEARBY_VEHICLES(pid, 2000)) do	
 			if not VEHICLE.IS_VEHICLE_SEAT_FREE(vehicle, -1) then
 				local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(vehicle, -1)
@@ -4947,17 +5290,357 @@ wait = util.yield
 					PED.SET_PED_MAX_HEALTH(driver, 300)
 					ENTITY.SET_ENTITY_INVINCIBLE(driver, true)
 					ENTITY.SET_ENTITY_INVINCIBLE(vehicle, true)
-					VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 40)
+					VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
 					VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
 					TASK.CLEAR_PED_TASKS_IMMEDIATELY(driver)
 					PED.SET_PED_INTO_VEHICLE(driver, vehicle, -1)
 					PED.SET_PED_COMBAT_ATTRIBUTES(driver, 46, true)
 					TASK.TASK_COMBAT_PED(driver, player_ped, 0, 0)
 					TASK.TASK_VEHICLE_MISSION_PED_TARGET(driver, vehicle, player_ped, 6, 100, 0, 0, 0, true)
+					wait(10)
 				end
 			end
 		end
 	end)
+
+	menu.action(vehatk_root, ('Calm Down Traffic'), {'tcalm'}, 'does what it says. meant for hostile traffic options. Wont work if theyre on.', function()
+	local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+	for k, vehicle in pairs(GET_NEARBY_VEHICLES(pid, 2050)) do	
+		if not VEHICLE.IS_VEHICLE_SEAT_FREE(vehicle, -1) then
+			local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(vehicle, -1)
+			if not PED.IS_PED_A_PLAYER(driver) then
+					REQUEST_CONTROL_LOOP(driver)
+					PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(driver, false)
+					TASK.CLEAR_PED_TASKS_IMMEDIATELY(driver)
+					PED.SET_PED_COMBAT_ATTRIBUTES(driver, 46, false)
+					PED.SET_PED_INTO_VEHICLE(driver, vehicle, -1)
+				end
+			end
+		end
+	end)
+	
+
+
+function requestModels(...)
+	local arg = {...}
+	for _, model in ipairs(arg) do
+		if not STREAMING.IS_MODEL_VALID(model) then
+			util.toast(model)
+			error("tried to request an invalid model")
+		end
+		STREAMING.REQUEST_MODEL(model)
+		while not STREAMING.HAS_MODEL_LOADED(model) do
+			wait()
+		end
+	end
+end
+
+streetcars = {dilettante, issi, exemplar, f620, felon, jackal, oracle2, zion, dominator, gauntlet, ruiner, buccaneer, sandking, cavalcade, dubsta, fq2,
+ gresley, habanero, huntley, landstalker, radi,  seminole, serrano, asea, emperor, fugitive, ingot, intruder, primo, shafter, stanier, surge, washington, buffalo,
+ carbonizzare, fusilade, massacro, ninef, rapidgt, surano, banshee,
+}
+
+streetdrivers = {a_f_m_eastsa_01, a_f_m_downtown_01
+
+}
+
+
+		menu.action(vehatk_root, "Send Annoying Lester", {"sendcripple"}, "Sends lester to ram them or run them over. Spawns on roads.", function(on_click)
+		local vehicleHash = util.joaat("asea")
+		local pedHash = 1302784073
+		requestModels(vehicleHash, pedHash)
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_SIREN(vehicle, true)
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, -1 do
+				local cop = entities.create_ped(5, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				PED.SET_PED_NEVER_LEAVES_GROUP(cop, true)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				PED.SET_PED_KEEP_TASK(cop, true)
+				PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(cop, true)
+				VEHICLE.SET_VEHICLE_COLOURS(vehicle, 64, 64)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(van, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 3, true)
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
+				TASK.TASK_VEHICLE_MISSION_PED_TARGET(cop, vehicle, targetPed, 6, 100, 0, 0, 0, true)
+			end
+		end
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end)
+	uj = util.joaat
+		menu.action(vehatk_root, "Send Annoying npc", {"sendmocc"}, "Sends an npc to ram them or run them over. Spawns on roads.", function(on_click)
+		local vehtable = {"fusilade", "radius", "fq2", "mule", "oracle"}
+		local retard = util.joaat("a_f_m_bevhills_01")
+		local car1 = 499169875
+		local car2 = -1651067813
+		local car3 = -1137532101
+		local car4 = 904750859
+		local car5 = 1348744438
+		local veh = random{499169875,  904750859,  -1137532101, -1651067813, 499169875}
+		requestModels(car1, car2, car3, car4, car5, retard)
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(veh, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_SIREN(vehicle, true)
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, -1 do
+				local cop = entities.create_ped(5, retard, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				PED.SET_PED_RANDOM_COMPONENT_VARIATION(cop, 0)
+				PED.SET_PED_NEVER_LEAVES_GROUP(cop, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(vehicle, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				PED.SET_PED_KEEP_TASK(cop, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 3, true)
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
+				TASK.TASK_VEHICLE_MISSION_PED_TARGET(cop, vehicle, targetPed, 6, 100, 0, 0, 0, true)
+			end
+		end
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(car1)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(car2)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(car3)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(car4)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(car5)
+	end)
+	
+		menu.action(vehatk_root, "Send Angry Trevor", {"sendmaniac"}, "Sends Trevor to ram them or run them over. Spawns on roads. Use watchdogs world hacking to delete, too dumb to get a functional delte button for this.", function(on_click)
+		local vehicleHash = util.joaat("bodhi2")
+		local pedHash = -1686040670
+		requestModels(vehicleHash, pedHash)
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_SIREN(vehicle, true)
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, -1 do
+				local cop = entities.create_ped(2, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				PED.SET_PED_KEEP_TASK(cop, true)
+				VEHICLE.SET_VEHICLE_COLOURS(vehicle, 32, 32)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(vehicle, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 46, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 3, false)
+				PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(cop, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "Betty 32")
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
+				ENTITY.SET_ENTITY_INVINCIBLE(cop, true)
+				ENTITY.SET_ENTITY_INVINCIBLE(vehicle, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, 0)
+				PED.SET_PED_NEVER_LEAVES_GROUP(cop, true)
+				TASK.TASK_VEHICLE_MISSION_PED_TARGET(cop, vehicle, targetPed, 6, 100, 0, 0, 0, true)
+			end
+			for seat2 = 0, 0 do --2nd invisible trevor to insult the player due to gta being gta
+				local trev = entities.create_ped(2, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(trev, vehicle, seat2)
+				PED.SET_PED_COMBAT_ATTRIBUTES(trev, 3, false)
+				PED.SET_PED_COMBAT_ATTRIBUTES(trev, 46, true)
+				ENTITY.SET_ENTITY_VISIBLE(trev, false, 0)
+				TASK.TASK_COMBAT_PED(trev, targetPed, 0, 16)
+				ENTITY.SET_ENTITY_INVINCIBLE(trev, true)
+				PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(trev, true)
+			end
+		end
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end)
+
+		menu.action(vehatk_root, "Send Guadalupe", {"sendgua"}, "Ya se enfade de sus hijos y ya viene a atropellar un pendejo", function(on_click)
+		local vehicleHash = util.joaat("seminole")
+		local pedHash = 261428209
+		requestModels(vehicleHash, pedHash)
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_SIREN(vehicle, true)
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, -1 do
+				local cop = entities.create_ped(2, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				PED.SET_PED_KEEP_TASK(cop, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(vehicle, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 46, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 3, false)
+				PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(cop, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "GUADALUPE")
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
+				ENTITY.SET_ENTITY_INVINCIBLE(cop, true)
+				ENTITY.SET_ENTITY_INVINCIBLE(vehicle, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, 0)
+				PED.SET_PED_NEVER_LEAVES_GROUP(cop, true)
+				TASK.TASK_VEHICLE_MISSION_PED_TARGET(cop, vehicle, targetPed, 6, 100, 0, 0, 0, true)
+			end
+		end
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end)
+	
+
+		menu.action(vehatk_root, "Send Guadalupe Non GM", {"sendgua2"}, "A nice exican grandmother who's had enough of your shit", function(on_click)
+		local vehicleHash = util.joaat("seminole")
+		local pedHash = 261428209
+		requestModels(vehicleHash, pedHash)
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_SIREN(vehicle, true)
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, -1 do
+				local cop = entities.create_ped(2, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				PED.SET_PED_KEEP_TASK(cop, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(vehicle, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 46, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 3, false)
+				PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(cop, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "GUADALUPE")
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, 0)
+				PED.SET_PED_NEVER_LEAVES_GROUP(cop, true)
+				TASK.TASK_VEHICLE_MISSION_PED_TARGET(cop, vehicle, targetPed, 6, 100, 0, 0, 0, true)
+			end
+		end
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end)
+
+		menu.action(cop_root, "Send FIB APC", {"fibapc"}, "you heard me.", function(on_click)
+		local vehicleHash = util.joaat("apc")
+		local pedHash = 1558115333 
+		requestModels(vehicleHash, pedHash)
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, 2 do
+				local cop = entities.create_ped(2, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				VEHICLE.SET_VEHICLE_COLOURS(vehicle, 0, 0)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(vehicle, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 46, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 5, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 2, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "FIB")
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 3, false)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, 3)
+				PED.SET_PED_MAX_HEALTH(cop, 600)
+				ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+				ENTITY.SET_ENTITY_HEALTH(cop, 600)
+				PED.SET_PED_SHOOT_RATE(cop, 5)
+				PED.SET_PED_SUFFERS_CRITICAL_HITS(cop, false)
+				WEAPON.GIVE_WEAPON_TO_PED(cop, 584646201, 9999, false, true)
+				PED.SET_PED_ACCURACY(cop, 100.0)
+				PED.SET_PED_HEARING_RANGE(cop, 99999)
+				PED.SET_PED_AS_COP(cop, true)
+				PED.SET_PED_CAN_RAGDOLL(cop, false)
+				VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, 0, 0, 0) --black
+				VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, 0, 0, 0)
+				VEHICLE.SET_VEHICLE_MOD_COLOR_1(vehicle, 3, 0, 0) --matte finish
+				VEHICLE.SET_VEHICLE_MOD_COLOR_2(vehicle, 3, 0, 0)-- matte secondary
+				VEHICLE.SET_VEHICLE_WHEEL_TYPE(vehicle, 11) --street wheel type
+				PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+				VEHICLE.SET_VEHICLE_MOD(vehicle, 23, 0)--wheel type?
+				VEHICLE.SET_VEHICLE_EXTRA_COLOURS(vehicle, 0, 0) --wheel color
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, 4) --plate type, 4 is SA EXEMPT which law enforcement and government vehicles use
+			end
+		end
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end)
+
 	
     menu.action(npctrolls_root, "Fill car with peds", {"fillcar"}, "Fills the player\'s car with nearby peds", function(on_click)
         local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
@@ -5010,35 +5693,36 @@ wait = util.yield
             util.toast("Player is not in a car :(")
         end
     end)
-
-   menu.action(attackers_root, "Clown attack", {"clownattack"}, "Sends clowns to attack the player", function(on_click)
+	
+   menu.action(attackers_root, "Clown attack", {"clownattack"}, "Sends clowns to attack the player.", function(on_click)
         local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
         local clown_hash = 71929310
         request_model_load(clown_hash)
         local van_hash = util.joaat("speedo2")
         request_model_load(van_hash)
         local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
-        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-10, 10),  math.random(-10, 10), 0.0)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
         spawn_pos.x = spawn_pos['x']
         spawn_pos.y = spawn_pos['y']
         spawn_pos.z = spawn_pos['z']
-        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        local van = entities.create_vehicle(van_hash, spawn_pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		SET_ENT_FACE_ENT(van, player_ped)
         if godmodeatk then
             ENTITY.SET_ENTITY_INVINCIBLE(van, true)
         end
         for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
-            local clown = entities.create_ped(1, clown_hash, spawn_pos, 0.0)
+            local clown = entities.create_ped(1, clown_hash, spawn_pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
             PED.SET_PED_INTO_VEHICLE(clown, van, i)
 			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
             if i % 2 == 0 then
-                WEAPON.GIVE_WEAPON_TO_PED(clown, -1810795771, 1000, false, true)
+                WEAPON.GIVE_WEAPON_TO_PED(clown, -1810795771, 9999, false, true)
             else
-                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 9999, false, true)
             end
-            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
 			PED.SET_PED_AS_COP(clown, true)
             PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
             PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
 			PED.SET_PED_ACCURACY(clown, 100.0)
 			PED.SET_PED_HEARING_RANGE(clown, 99999)
 			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
@@ -5065,7 +5749,9 @@ wait = util.yield
     end)
 
  local spawnedPeds = {} -- stores the spawned attackers
+	
 
+	
   menu.action(attackers_root, "Lester Gang attack", {"crippleatk"}, "lester the molester", function(on_click)
         local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
         local clown_hash = 1302784073
@@ -5073,7 +5759,7 @@ wait = util.yield
         local van_hash = util.joaat("jugular")
         request_model_load(van_hash)
         local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
-        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-10, 10),  math.random(-10, 10), 0.0)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
         local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
         
         if godmodeatk then
@@ -5082,10 +5768,6 @@ wait = util.yield
         
         for i= -1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
             local clown = entities.create_ped(1, clown_hash, spawn_pos, 0.0)
-            
-            if pmode then
-                table.insert(spawnedPeds, clown) -- inserts the ped handle in the list
-            end
 
             PED.SET_PED_INTO_VEHICLE(clown, van, i)
             
@@ -5098,6 +5780,7 @@ wait = util.yield
             PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
             PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
 			PED.SET_PED_ACCURACY(clown, 100.0)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
 			PED.SET_PED_HEARING_RANGE(clown, 99999)
 			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
 			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
@@ -5116,7 +5799,7 @@ wait = util.yield
 			end
             if i == -1 then
                 TASK.TASK_VEHICLE_CHASE(clown, player_ped)
-                WEAPON.GIVE_WEAPON_TO_PED(clown,584646201 , 1000, false, true)
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
                 PED.SET_PED_CAN_RAGDOLL(clown, false)
             else
                 TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
@@ -5125,6 +5808,8 @@ wait = util.yield
 			end
         end
     end)
+
+
 	
 	menu.toggle(atkab_root, "God Mode Vehicle", {"vehgm"}, "does what it says on the tin, only applies to vehicle attackers.", function(on)
 		godmodeatk = on
@@ -5134,19 +5819,81 @@ wait = util.yield
 		pcar = on
 	end)
 	
-	menu.action(attackers_root, "Rabbi Attack", {"rabbis"}, "sends some fat rabbis in a super car to attack the player", function(on_click)
+
+	
+	menu.action(cop_root, "FIB Attack", {"fibatk"}, "can be hard to escape from no matter the car, as long as it cant fly", function(on_click)
         local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
-        local clown_hash = 1809430156
+        local clown_hash = 1558115333
         request_model_load(clown_hash)
         local van_hash = util.joaat("krieger")
         request_model_load(van_hash)
         local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
-        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-10, 10),  math.random(-10, 10), 0.0)
-        spawn_pos.x = spawn_pos['x']
-        spawn_pos.y = spawn_pos['y']
-        spawn_pos.z = spawn_pos['z']
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
         local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
         for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, clown_hash, spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(van, "FIB")
+			VEHICLE.SET_VEHICLE_EXPLODES_ON_HIGH_EXPLOSION_DAMAGE(van, false)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			VEHICLE.SET_VEHICLE_MOD_KIT(van, 0)
+			VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(van, 0, 0, 0) --black
+			VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(van, 0, 0, 0)
+			VEHICLE.SET_VEHICLE_MOD_COLOR_1(van, 3, 0, 0) --matte finish
+			VEHICLE.SET_VEHICLE_MOD_COLOR_2(van, 3, 0, 0)-- matte secondary
+			VEHICLE.SET_VEHICLE_WHEEL_TYPE(van, 11) --street wheel type
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			VEHICLE.SET_VEHICLE_MOD(van, 0, 3) --spoiler
+			VEHICLE.SET_VEHICLE_MOD(van, 23, 0)--wheel type?
+			VEHICLE.SET_VEHICLE_EXTRA_COLOURS(van, 0, 0) --wheel color
+			VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(van, 4) --plate type, 4 is SA EXEMPT which law enforcement and government vehicles use
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+
+	menu.action(broken_root, "GTA player attack", {"gtap"}, "", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = 1885233650
+        request_model_load(clown_hash)
+        local van_hash = util.joaat("t20")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, -1 do
             local clown = entities.create_ped(1, clown_hash, spawn_pos, 0.0)
             PED.SET_PED_INTO_VEHICLE(clown, van, i)
             if i % 2 == 0 then
@@ -5162,6 +5909,330 @@ wait = util.yield
 			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
 			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
 			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			VEHICLE.SET_VEHICLE_MOD_KIT(van, 0)
+			VEHICLE.SET_VEHICLE_COLOURS(van, 0, 0)
+			VEHICLE.SET_VEHICLE_MOD_COLOR_1(van, 3, 0, 0)
+			VEHICLE.SET_VEHICLE_MOD_COLOR_2(van, 3, 0, 0)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+		menu.action(attackers_root, "Send TP Industries Tactical Team", {"senddrugaddicts"}, "is only affected by the cannot leave vehicle attribute", function(on_click)
+		local vehicleHash = util.joaat("bodhi2")
+		local pedHash = -1686040670 --trevor
+		local ronhash = -1124046095
+		local wadehash = -1835459726
+		requestModels(vehicleHash, pedHash, ronhash, wadehash)
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, -1 do
+				local cop = entities.create_ped(2, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				VEHICLE.SET_VEHICLE_COLOURS(vehicle, 32, 32)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(vehicle, true)
+				VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle,-1, 3)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 46, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "Betty 32")
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(vehicle, 50)
+				ENTITY.SET_ENTITY_INVINCIBLE(vehicle, true)
+				VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, 0)
+				PED.SET_PED_MAX_HEALTH(cop, 600)
+				ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+				ENTITY.SET_ENTITY_HEALTH(cop, 600)
+				PED.SET_PED_SHOOT_RATE(cop, 5)
+				PED.SET_PED_SUFFERS_CRITICAL_HITS(cop, false)
+				WEAPON.GIVE_WEAPON_TO_PED(cop, 584646201, 9999, false, true)
+				PED.SET_PED_ACCURACY(cop, 100.0)
+				PED.SET_PED_HEARING_RANGE(cop, 99999)
+				PED.SET_PED_AS_COP(cop, true)
+				PED.SET_PED_CAN_RAGDOLL(cop, false)
+			end
+			for seat2 = 0, 0 do
+				local ron = entities.create_ped(4, ronhash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(ron, vehicle, seat2)
+				PED.SET_PED_COMBAT_ATTRIBUTES(ron, 46, true)
+				TASK.TASK_COMBAT_PED(ron, targetPed, 0, 16)
+				PED.SET_PED_MAX_HEALTH(ron, 300)
+				ENTITY.SET_ENTITY_PROOFS(ron, false, true, false, false, true, false, false, false)
+				ENTITY.SET_ENTITY_HEALTH(ron, 300)
+				PED.SET_PED_SHOOT_RATE(ron, 5)
+				PED.SET_PED_SUFFERS_CRITICAL_HITS(ron, false)
+				PED.SET_PED_ACCURACY(ron, 100.0)
+				PED.SET_PED_HEARING_RANGE(ron, 99999)
+				PED.SET_PED_AS_COP(ron, true)
+				WEAPON.GIVE_WEAPON_TO_PED(ron, 584646201 , 9999, false, true)
+			end
+				for seat3 = 1, 1 do
+				local wade = entities.create_ped(4, wadehash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(wade, vehicle, seat3)
+				PED.SET_PED_COMBAT_ATTRIBUTES(wade, 46, true)
+				TASK.TASK_COMBAT_PED(wade, targetPed, 0, 16)
+				PED.SET_PED_MAX_HEALTH(wade, 300)
+				ENTITY.SET_ENTITY_PROOFS(wade, false, true, false, false, true, false, false, false)
+				ENTITY.SET_ENTITY_HEALTH(wade, 300)
+				PED.SET_PED_SHOOT_RATE(wade, 5)
+				PED.SET_PED_SUFFERS_CRITICAL_HITS(wade, false)
+				PED.SET_PED_ACCURACY(wade, 100.0)
+				PED.SET_PED_HEARING_RANGE(wade, 99999)
+				PED.SET_PED_AS_COP(wade, true)
+				WEAPON.GIVE_WEAPON_TO_PED(wade, 584646201 , 9999, false, true)
+				PED.SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(wade, 1)
+			end
+		end
+		if pcar then 
+			PED.SET_PED_COMBAT_ATTRIBUTES(ron, 3, false)
+			PED.SET_PED_COMBAT_ATTRIBUTES(cop, 3, false)
+			PED.SET_PED_COMBAT_ATTRIBUTES(wade, 3, false)
+		end
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end)
+
+
+ 	menu.action(attackers_root, "Extreme Attack", {"mercs"}, "sends the most brutal attackers, specially created to be brutal and annoying. Toxic.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid) -- gets the player
+        local clown_hash = 788443093 --the hash number of the attacker
+        request_model_load(clown_hash) --loads it
+        local van_hash = util.joaat("kuruma2") --defines a kuruma as van_hash
+        request_model_load(van_hash) --loads it
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true) --defines the victims current coords
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0) --creates a 360 bubble where they have a chance to spawn
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped)) --creates the van, then defines that van as "van"
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do --for every seat in the current vehicle, (in this case 4) do this
+            local clown = entities.create_ped(1, clown_hash, spawn_pos, 0.0) --creates the attacking ped
+            PED.SET_PED_INTO_VEHICLE(clown, van, i) -- puts the attacking ped into the vehicle, and one for each seat
+            if i % 2 == 0 then -- dont know lol, all I know is this affects what weapon they have inside and outside a car
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)-- gives them an AP pistol
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true) --does what it says
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true) --5 means "fight when unarmed"
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true) --46 means always fight
+			PED.SET_PED_ACCURACY(clown, 100.0) --makes them stupid accurate
+			PED.SET_PED_HEARING_RANGE(clown, 99999) -- will aggro on you if you shoot a gun from miles away
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false) -- makes headshots deal the same damage as body shots, and they cannot fall from being shot
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3) -- does what it says, number defines what the vehicle is locked to, in this case other players
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50) -- does what it says
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(van, true) --redundant locking
+			ENTITY.SET_ENTITY_INVINCIBLE(van, true) -- does what it says, the true/false defines if the engine is on
+			PED.SET_PED_MAX_HEALTH(clown, 250) --does what is says, is the peds max possible health
+			ENTITY.SET_ENTITY_HEALTH(clown, 250) --does what it says, actually setting the peds health to this.
+			PED.SET_PED_KEEP_TASK(clown, true) --does what it says, probably useless
+			PED.SET_PED_ARMOUR(clown, 200) --does what it says
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false) --supposed to make them fire and melee proof, doesnt seem to actually fucking work
+			PED.SET_PED_SHOOT_RATE(clown, 3) --makes them shoot more often and be deadlier
+            if i == -1 then --if inside the aforementioned car, do this
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped) --ped is told to chase the victim
+				WEAPON.GIVE_WEAPON_TO_PED(clown,584646201 , 1000, false, true) --gives them AP pistol
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true) --gives them an advanced rifle or carbine rifle, cant remember, the 1000 is how much ammo they are given.
+				PED.SET_PED_CAN_RAGDOLL(clown, false) --does what is says
+            end
+			if pcar then --basically a little option that depends on whether or not another option is on or not, and allows you to control their behavior
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false) --keeps them from exiting the car
+			end
+			if d then -- unused
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000) --does what it says, this remains unused because OP
+			end
+        end
+    end)
+memory.read_vector3 = function(int) local x,y,z = v3.get(int) return {x=x,y=y,z=z} end
+wait = util.yield
+joaat = util.joaat
+alloc = memory.alloc
+cTime = util.current_time_millis
+create_tick_handler = util.create_tick_handler
+
+	local function polizei(pId, vehicleHash, pedHash)
+		local vehicleHash = util.joaat("police3")
+		local pedHash = util.joaat("s_m_y_cop_01")
+		requestModels(vehicleHash, pedHash)
+		
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pId)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		util.toast(pos.x, pos.y, pos.z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_SIREN(vehicle, true)
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, 0 do
+				local cop = entities.create_ped(5, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				PED.SET_PED_RANDOM_COMPONENT_VARIATION(cop, 0)
+				local weapon = (seat == -1) and "weapon_pistol" or "weapon_pumpshotgun"
+				WEAPON.GIVE_WEAPON_TO_PED(cop, util.joaat(weapon), -1, false, true)
+				PED.SET_PED_NEVER_LEAVES_GROUP(cop, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 1, true)
+				PED.SET_PED_AS_COP(cop, true)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				PED.SET_PED_KEEP_TASK(cop, true)
+				util.create_tick_handler(function()
+					if TASK.GET_SCRIPT_TASK_STATUS(cop, 0x2E85A751) == 7 then
+						TASK.CLEAR_PED_TASKS(cop)
+						TASK.TASK_SMART_FLEE_PED(cop, PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pId), 1000.0, -1, false, false)
+						PED.SET_PED_KEEP_TASK(cop, true)
+						return false
+					end
+					return true
+				end)
+			end	
+		end
+
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end
+
+function addBlipForEntity(entity, blipSprite, colour)
+	local blip = HUD.ADD_BLIP_FOR_ENTITY(entity)
+	HUD.SET_BLIP_SPRITE(blip, blipSprite)
+	HUD.SET_BLIP_COLOUR(blip, colour)
+	HUD.SHOW_HEIGHT_ON_BLIP(blip, false)
+	HUD.SET_BLIP_ROTATION(blip, SYSTEM.CEIL(ENTITY.GET_ENTITY_HEADING(entity)))
+	NETWORK.SET_NETWORK_ID_CAN_MIGRATE(entity, false)
+	util.create_thread(function()
+		while not ENTITY.IS_ENTITY_DEAD(entity) do
+			local heading = ENTITY.GET_ENTITY_HEADING(entity)
+			HUD.SET_BLIP_ROTATION(blip, SYSTEM.CEIL(heading))
+			wait()
+		end
+		util.remove_blip(blip)
+	end)
+	return blip
+end
+
+	menu.action(cop_root, "Send Police Car", {"sendpolice"}, "", function(on_click)
+		local vehicleHash = util.joaat("police3")
+		local pedHash = util.joaat("s_m_y_cop_01")
+		requestModels(vehicleHash, pedHash)
+		
+		local targetPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pId)
+		local pos = ENTITY.GET_ENTITY_COORDS(targetPed)
+		local vehicle = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+		if not ENTITY.DOES_ENTITY_EXIST(vehicle) then
+			return
+		end
+
+		local offset = getOffsetFromEntityGivenDistance(vehicle, 50.0)
+		local outCoords = v3.new()
+		local outHeading = memory.alloc()
+
+		if PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(offset.x, offset.y, offset.z, outCoords, outHeading, 1, 3.0, 0) then
+			ENTITY.SET_ENTITY_COORDS(vehicle, v3.getX(outCoords), v3.getY(outCoords), v3.getZ(outCoords))
+			ENTITY.SET_ENTITY_HEADING(vehicle, memory.read_float(outHeading))
+			VEHICLE.SET_VEHICLE_SIREN(vehicle, true)
+			VEHICLE.SET_VEHICLE_ENGINE_ON(vehicle, true, true, true)
+			for seat = -1, 0 do
+				local cop = entities.create_ped(5, pedHash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+				PED.SET_PED_INTO_VEHICLE(cop, vehicle, seat)
+				PED.SET_PED_RANDOM_COMPONENT_VARIATION(cop, 0)
+				local weapon = (seat == -1) and "weapon_pistol" or "weapon_pumpshotgun"
+				WEAPON.GIVE_WEAPON_TO_PED(cop, util.joaat(weapon), -1, false, true)
+				PED.SET_PED_NEVER_LEAVES_GROUP(cop, true)
+				PED.SET_PED_COMBAT_ATTRIBUTES(cop, 1, true)
+				PED.SET_PED_AS_COP(cop, true)
+				TASK.TASK_COMBAT_PED(cop, targetPed, 0, 16)
+				PED.SET_PED_KEEP_TASK(cop, true)
+				util.create_tick_handler(function()
+					if TASK.GET_SCRIPT_TASK_STATUS(cop, 0x2E85A751) == 7 then
+						TASK.CLEAR_PED_TASKS(cop)
+						TASK.TASK_SMART_FLEE_PED(cop, PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pId), 1000.0, -1, false, false)
+						PED.SET_PED_KEEP_TASK(cop, true)
+						return false
+					end
+					return true
+				end)
+			end	
+		end
+
+		v3.free(outCoords)
+		memory.free(outHeading)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(pedHash)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(vehicleHash)
+	end)
+
+
+		menu.action(cop_root, "Send Cracked Police", {"sendswat"}, "Cracked Police Car, now with a 50/50 chance for a cop to be a female. Does not spawn on traffic nodes.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"368603149", "1581098148"}
+		local copf = 368603149
+		local copm = 1581098148
+        request_model_load(copf)
+		request_model_load(copm)
+        local van_hash = util.joaat("police3")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+		local outCoords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-5, 5), -20, 0.0)
+        local van = entities.create_vehicle(van_hash, outCoords, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), outCoords, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
 			ENTITY.SET_ENTITY_HEALTH(clown, 250)
 			PED.SET_PED_SHOOT_RATE(clown, 5)
 			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
@@ -5186,14 +6257,14 @@ wait = util.yield
         end
     end)
 	
-	menu.action(attackers_root, "Extreme Attack", {"mercs"}, "sends the most brutal attackers, specially created to be brutal and annoying. Toxic.", function(on_click)
+		menu.action(cop_root, "Send Cracked Noose", {"sendswat"}, "Cracked noose van. Does not spawn on traffic nodes.", function(on_click)
         local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
-        local clown_hash = 788443093
+        local clown_hash = -1920001264
         request_model_load(clown_hash)
-        local van_hash = util.joaat("kuruma2")
+        local van_hash = util.joaat("fbi2")
         request_model_load(van_hash)
         local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
-        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-10, 10),  math.random(-10, 10), 0.0)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
         spawn_pos.x = spawn_pos['x']
         spawn_pos.y = spawn_pos['y']
         spawn_pos.z = spawn_pos['z']
@@ -5206,67 +6277,667 @@ wait = util.yield
             else
                 WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
             end
-			PED.SET_PED_AS_COP(clown,-1,0,1,2, true)
+			PED.SET_PED_AS_COP(clown, true)
             PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
             PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
 			PED.SET_PED_ACCURACY(clown, 100.0)
 			PED.SET_PED_HEARING_RANGE(clown, 99999)
-			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown,-1,0,1,2, false)
 			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
 			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
-			VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(van, true)
-			ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
 			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
 			ENTITY.SET_ENTITY_HEALTH(clown, 250)
-			PED.SET_PED_ARMOUR(clown, 200)
-			PED.SET_PED_SHOOT_RATE(clown, 3)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			ENTITY.SET_ENTITY_INVINCIBLE(van, true)
 			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
-            if i == -1 then
-                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
-				WEAPON.GIVE_WEAPON_TO_PED(clown,584646201 , 1000, false, true)
-				PED.SET_PED_CAN_RAGDOLL(clown, false)
-            else
-                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
-				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
-				PED.SET_PED_CAN_RAGDOLL(clown, false)
-            end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
 			if pcar then 
 				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
 			end
 			if d then
 				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
 			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+		menu.action(cop_root, "Send Police Helicopter", {"sendswat"}, "an enhanced police maverick. Nothing too special apart from extra fire rate, health, and accuracy. God mode attribute wont keep the back rotor from being shot out. They also have a tendency to crash.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = -1920001264
+        request_model_load(clown_hash)
+        local van_hash = util.joaat("polmav")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-30, 30),  math.random(-30, 30), 60)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, clown_hash, spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			VEHICLE.SET_VEHICLE_MOD_KIT(van, 0)
+			VEHICLE.SET_VEHICLE_LIVERY(van, 0)
+			VEHICLE.SET_VEHICLE_MOD(van, 48, 0)
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			VEHICLE.SET_HELI_BLADES_FULL_SPEED(van)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, false, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+			menu.action(cop_root, "Send Police Dinghy", {"sendmari"}, "for idiots who thought they could escape by water/ watercraft.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		local clown_hash = 1581098148
+        request_model_load(clown_hash)
+        local van_hash = util.joaat("predator")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, clown_hash, spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			VEHICLE.SET_VEHICLE_SIREN(van, true)
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+			menu.action(army_root, "Send Marine Platoon", {"sendmarp"}, "literally a copy paste of every other vehicle attacker option but with a small marine platoon. Does not spawn on traffic nodes. Vehicle is invulnerable by default.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("barracks3")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
         end
     end)
 	
 
-		
-		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(ped_hash)
-		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(veh_hash)
-
-    menu.action(attackers_root, "Motorcycle gang attack", {"mcgangattack"}, "Sends a motorcycle gang to attack the player", function(on_click)
-        send_groundv_attacker(-159126838, 850468060, pid, true)
+		menu.action(army_root, "Send Marine Half Track", {"sendmarht"}, "literally a copy paste of every other vehicle attacker option but with aforementioned vehicle. Does not spawn on traffic nodes. Attackers do not leave the vehicle and the gun on the back IS used.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("halftrack")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+			PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+			menu.action(army_root, "Send Marine Crusader", {"sendmarht"}, "literally a copy paste of every other vehicle attacker option but with aforementioned vehicle. Does not spawn on traffic nodes.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("crusader")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+			PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+			menu.action(army_root, "Send Marine Zhaba", {"sendmarzh"}, "literally a copy paste of every other vehicle attacker option but with aforementioned vehicle. Does not spawn on traffic nodes.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("technical2")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+			PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			TASK.SET_PED_PATH_PREFER_TO_AVOID_WATER(clown, false)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+	
+			menu.action(army_root, "Send Marine Insurgent", {"sendmari"}, "literally a copy paste of every other vehicle attacker option but with marines. Does not spawn on traffic nodes.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("insurgent")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
     end)
 
-    menu.action(attackers_root, "Helicopter attack", {"heliattack"}, "Send an attack chopper to attack the player", function(on_click)
+			menu.action(army_root, "Send Marine Insurgent (npc cant exit)", {"sendmari2"}, "same as above but they cant leave the vehicle. Does not spawn on traffic nodes.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("insurgent")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+			PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+			menu.action(army_root, "Send Marine Khanjali", {"sendmari"}, "literally a copy paste of every other vehicle attacker option but with marines. Does not spawn on traffic nodes. Attackers do not leave the vehicle by default.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("khanjali")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+
+	
+			menu.action(army_root, "Send Marine APC", {"sendmari"}, "literally a copy paste of every other vehicle attacker option but with an APC. Does not spawn on traffic nodes. Enemies CAN leave vehicle, but for some reason they don't. They can follow into water and thru water, but are pretty slow and might get stuck.", function(on_click)
+        local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local clown_hash = {"1490458366", "1925237458"}
+		local marine1 = 1925237458
+		local marine2 = 1490458366
+        request_model_load(marine1)
+		request_model_load(marine2)
+        local van_hash = util.joaat("apc")
+        request_model_load(van_hash)
+        local coords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+        local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(player_ped, math.random(-20, 20), -20, 0.0)
+        spawn_pos.x = spawn_pos['x']
+        spawn_pos.y = spawn_pos['y']
+        spawn_pos.z = spawn_pos['z']
+        local van = entities.create_vehicle(van_hash, spawn_pos, ENTITY.GET_ENTITY_HEADING(player_ped))
+        for i=-1, VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(van) - 1 do
+            local clown = entities.create_ped(1, random(clown_hash), spawn_pos, 0.0)
+            PED.SET_PED_INTO_VEHICLE(clown, van, i)
+            if i % 2 == 0 then
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            else
+                WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201, 1000, false, true)
+            end
+			PED.SET_PED_AS_COP(clown, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 5, true)
+            PED.SET_PED_COMBAT_ATTRIBUTES(clown, 46, true)
+			PED.SET_PED_ACCURACY(clown, 100.0)
+			TASK.SET_PED_PATH_PREFER_TO_AVOID_WATER(clown, false)
+			PED.SET_PED_HEARING_RANGE(clown, 99999)
+			VEHICLE.SET_VEHICLE_DOORS_LOCKED(van, 3)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(van, 50)
+			PED.SET_PED_RANDOM_COMPONENT_VARIATION(clown, 0)
+			PED.SET_PED_MAX_HEALTH(clown, 250)
+			ENTITY.SET_ENTITY_PROOFS(ped, false, true, true, false, true, false, false, false)
+			ENTITY.SET_ENTITY_HEALTH(clown, 250)
+			PED.SET_PED_SHOOT_RATE(clown, 5)
+			PED.SET_PED_SUFFERS_CRITICAL_HITS(clown, false)
+			if pcar then 
+				PED.SET_PED_COMBAT_ATTRIBUTES(clown, 3, false)
+			end
+			if d then
+				PED.SET_AI_WEAPON_DAMAGE_MODIFIER(clown, 3000000)
+			end
+			if godmodeatk then
+				ENTITY.SET_ENTITY_INVINCIBLE(van, true)
+			end
+            if i == -1 then
+                TASK.TASK_VEHICLE_CHASE(clown, player_ped)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, 584646201 , 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            else
+                TASK.TASK_COMBAT_PED(clown, player_ped, 0, 16)
+				WEAPON.GIVE_WEAPON_TO_PED(clown, -1357824103, 1000, false, true)
+				PED.SET_PED_CAN_RAGDOLL(clown, false)
+            end
+        end
+    end)
+	
+
+
+
+    menu.action(attackers_root, "Helicopter attack", {"heliattack"}, "Send an attack chopper to attack the player. Seems to be broken at the moment and I cant seem to decipher why.", function(on_click)
         send_aircraft_attacker(1543134283, util.joaat("mp_m_bogdangoon"), pid)
     end)
+	 
+gWeapons = {												
+	WT_PIST 		= "weapon_pistol",
+	WT_STUN			= "weapon_stungun",
+	WT_RAYPISTOL	= "weapon_raypistol",
+	WT_RIFLE_SCBN 	= "weapon_specialcarbine",
+	WT_SG_PMP		= "weapon_pumpshotgun",
+	WT_MG			= "weapon_mg",
+	WT_RIFLE_HVY 	= "weapon_heavysniper",
+	WT_MINIGUN		= "weapon_minigun",
+	WT_RPG			= "weapon_rpg",
+	WT_RAILGUN 		= "weapon_railgun",
+	WT_CMPGL 		= "weapon_compactlauncher",
+	WT_EMPL 		= "weapon_emplauncher"
+}
 
-    menu.slider(attackers_root, "Gun to give to attackers", {"giveatkgun"}, "0 = None\n1 = AP Pistol\n2 = Carbine Rifle MKII\n3 = Shotgun\n4 = Knife\nDoes not affect some attacker options.", 0, 10, 0, 1, function(s)
-        if s == 0 then
-            atkgun = 0
-        else
-            atkgun = good_guns[s]
-        end
-      end)
 
-    menu.action(customatk_root, "Input weapon hash to give", {"customwephash"}, "Input a custom weapon hash for the attacker. You must enter the hash for this one, not the string.", function(on_click)
-        util.toast("Please input the weapon hash")
-        menu.show_command_box("customwephash" .. PLAYER.GET_PLAYER_NAME(pid) .. " ")
-    end, function(on_command)
-        atkgun = on_command
-        util.toast("Weapon set to " .. on_command)
-    end)
+gMeleeWeapons = {
+	WT_UNARMED 		= "weapon_unarmed",
+	WT_KNIFE		= "weapon_knife",
+	WT_MACHETE		= "weapon_machete",
+	WT_BATTLEAXE	= "weapon_battleaxe",
+	WT_WRENCH		= "weapon_wrench",
+	WT_HAMMER		= "weapon_hammer",
+	WT_BAT			= "weapon_bat"
+}
+
+
+-- here you can modify which peds are available to choose
+-- ["name shown in Stand"] = "ped model ID"
+gPedModels = {
+	["Prisoner"] 				= "s_m_y_prismuscl_01",
+	["Mime"] 					= "s_m_y_mime",
+	["Astronaut"] 				= "s_m_m_movspace_01",
+	["SWAT"] 					= "s_m_y_swat_01",
+	["Ballas Ganster"] 			= "csb_ballasog",
+	["Marine"] 					= "csb_ramp_marine",
+	["Female Police Officer"] 	= "s_f_y_cop_01",
+	["Male Police Officer"] 	= "s_m_y_cop_01",
+	["Jesus"] 					= "u_m_m_jesus_01",
+	["Zombie"] 					= "u_m_y_zombie_01",
+	["Juggernaut"] 				= "u_m_y_juggernaut_01",
+	["Clown"] 					= "s_m_y_clown_01",
+	["Hooker"] 					= "s_f_y_hooker_01",
+	["Altruist"] 				= "a_m_y_acult_01"
+}
+
 
     menu.toggle(ls_naughty, "Swiss cheese", {"swisscheese"}, "Rains a shit ton of bullets on the player. Anonymously.", function(on)
         if on then
@@ -5996,7 +7667,7 @@ peds_thread = util.create_thread(function (thr)
 						WEAPON.SET_PED_DROPS_WEAPONS_WHEN_DEAD(ped, false)
                         TASK.TASK_COMBAT_PED(ped, combat_tar, 0, 16)
 						PED.SET_PED_AS_COP(ped, true)
-						if d then
+						if d then --unused
 							PED.SET_AI_WEAPON_DAMAGE_MODIFIER(ped, 3000000)
 						end
                     end
@@ -6174,7 +7845,7 @@ players_thread = util.create_thread(function (thr)
                     if meanantioppressor then
                         menu.trigger_commands("kick".. PLAYER.GET_PLAYER_NAME(pid))
                     else
-                        entities.delete(vehicle)
+                        entities.delete_by_handle(vehicle)
                     end
                   end
                 end
@@ -6185,7 +7856,7 @@ players_thread = util.create_thread(function (thr)
                 local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, true)
                 if vehicle ~= 0 then
                     if VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(vehicle) then 
-                        entities.delete(vehicle)
+                        entities.delete_by_handle(vehicle)
                     end
                 end
             end
@@ -6764,7 +8435,7 @@ while true do
                 local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)
                 if driver == 0 or not is_ped_player(driver) then
                     if not is_ped_player(driver) then
-                        entities.delete(driver)
+                        entities.delete_by_handle(driver)
                     end
                     local hash = 0x9C9EFFD8
                     request_model_load(hash)
@@ -6810,7 +8481,7 @@ while true do
         t_coords = ENTITY.GET_ENTITY_COORDS(lastcar, true)
         dist = MISC.GET_DISTANCE_BETWEEN_COORDS(p_coords['x'], p_coords['y'], p_coords['z'], t_coords['x'], t_coords['y'], t_coords['z'], false)
         if lastcar == 0 or ENTITY.GET_ENTITY_HEALTH(lastcar) == 0 or dist <= 5 then
-            entities.delete(tesla_ped)
+            entities.delete_by_handle(tesla_ped)
             VEHICLE.BRING_VEHICLE_TO_HALT(lastcar, 5.0, 2, true)
             VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(lastcar, false)
             VEHICLE.START_VEHICLE_HORN(lastcar, 1000, util.joaat("NORMAL"), false)
@@ -7073,6 +8744,7 @@ while true do
         FIRE.ADD_EXPLOSION(coords['x'], coords['y'], coords['z'], customexplosion, 100.0, true, false, 0.0)
 
     end
+
 
 	util.yield()
 end
