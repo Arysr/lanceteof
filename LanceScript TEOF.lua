@@ -7,7 +7,9 @@ slaxml = require("lib/slaxml")
 util.require_no_lag("natives-1627063482")
 handle_ptr = memory.alloc(13*8)
 
-util.toast("TEOF edits by Axhov#0001, LanceScript By Lance")
+if SCRIPT_MANUAL_START then
+	util.toast("TEOF edits by Axhov#0001, LanceScript By Lance")
+end
 vehicles_dir = filesystem.scripts_dir() .. '\\menyoo vehicles\\'
 if not filesystem.is_dir(vehicles_dir) then
     filesystem.mkdir(vehicles_dir)
